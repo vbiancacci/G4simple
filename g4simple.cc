@@ -330,6 +330,12 @@ class G4SimpleSteppingAction : public G4UserSteppingAction, public G4UImessenger
         fVolIDMap[vpv] = id;
       }
 
+      // If not in a sensitive volume, get out of here.
+      if(id == -1) return; 
+
+      // Don't write Edep=0 steps (unless desired)
+      if(!fRecordAllSteps && step->GetTotalEnergyDeposit() == 0) return;
+
       // always record primary event info from pre-step of first step
       // if recording all steps, do this block to record prestep info
       if(fVolID.size() == 0 || (fRecordAllSteps && step->GetTrack()->GetCurrentStepNumber() == 1)) {
@@ -359,11 +365,7 @@ class G4SimpleSteppingAction : public G4UserSteppingAction, public G4UImessenger
         if(fOption == kStepWise) WriteRow(man);
       }
 
-      // If not in a sensitive volume, get out of here.
-      if(id == -1) return; 
 
-      // Don't write Edep=0 steps (unless desired)
-      if(!fRecordAllSteps && step->GetTotalEnergyDeposit() == 0) return;
 
       // Now record post-step info
       fVolID.push_back(id);
